@@ -1,0 +1,2 @@
+# ignore *.js since source files are written in coffee script
+*.js
