@@ -1,0 +1,16 @@
+.d3chart .circle-wrap circle {
+	stroke: gray;
+	fill: white;
+	r: 3;
+}
+.d3chart .text-wrap rect {
+	stroke: gray;
+	fill: wheat;
+}
+.d3chart .text-wrap text {
+	stroke: black;
+}
+.d3chart .line {
+	stroke-width: 2;
+	fill: none;
+}

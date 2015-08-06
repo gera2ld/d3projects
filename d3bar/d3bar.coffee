@@ -51,6 +51,7 @@ define((require, module, exports) ->
       )
       .append('line')
       .attr(
+        'class': 'animate-line'
         stroke: (d, i) -> getColor()
         'stroke-width': options.height
         x1: 0

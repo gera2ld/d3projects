@@ -1,0 +1,12 @@
+.d3bar .animate-line {
+	stroke-dasharray: 5000;
+	animation: dash 5s linear;
+}
+@keyframes dash {
+	from {
+		stroke-dashoffset: 5000;
+	}
+	to {
+		stroke-dashoffset: 0;
+	}
+}

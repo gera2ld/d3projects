@@ -7,9 +7,7 @@ define((require, module, exports) ->
     minY: null
     maxY: null
     stroke: 'blue'
-    strokeWidth: 2
     fillStart: 'green'
-    radius: 3
     threshold: 15
     getText: null
     fontSize: 12
@@ -58,9 +56,8 @@ define((require, module, exports) ->
       .interpolate('monotone')
     svg.append('path')
       .attr(
+        'class': 'line'
         stroke: options.stroke
-        'stroke-width': options.strokeWidth
-        fill: 'none'
         d: line(data)
       )
 
@@ -87,7 +84,10 @@ define((require, module, exports) ->
       .attr('offset', 1)
       .style('stop-color', 'white')
     svg.append('path')
-      .attr('d', area(data))
+      .attr(
+        'class': 'area'
+        d: area(data)
+      )
       .style('fill', 'url(#' + fillId + ')')
 
     display = (hide) ->
@@ -117,7 +117,6 @@ define((require, module, exports) ->
         circle.attr(
           cx: d.dx
           cy: d.dy
-          r: options.radius
         )
         current.circle.display()
       else
@@ -125,18 +124,21 @@ define((require, module, exports) ->
     showText = (d) ->
       if d
         text = options.getText?(d) or [d.y]
+        th = options.fontSize * (1.5 * text.length + .5)
         current.tips.rect
           .attr(
             width: options.rectWidth
-            height: options.fontSize * (1.5 * text.length + .5)
+            height: th
             rx: 5
             ry: 5
           )
         tx = d.dx - 5
-        ty = d.dy - 30
-        tx = 0 if tx < 0
+        ty = d.dy - th - 5
         maxX = options.width - options.rectWidth
+        maxY = options.height - th
         tx = maxX if tx > maxX
+        tx = 0 if tx < 0
+        ty = maxY if ty > maxY
         ty = 0 if ty < 0
         tips = current.tips.wrap
           .style('transform', 'translate(' + tx + 'px,' + ty + 'px)')
