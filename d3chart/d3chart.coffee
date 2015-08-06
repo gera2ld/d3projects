@@ -12,6 +12,8 @@ define((require, module, exports) ->
     radius: 3
     threshold: 15
     getText: null
+    fontSize: 12
+    rectWidth: 40
   }
   frag = document.createDocumentFragment()
 
@@ -123,19 +125,32 @@ define((require, module, exports) ->
         current.circle.display(true)
     showText = (d) ->
       if d
-        text = options.getText?(d) or d.y
-        tx = d.dx - 5
-        ty = d.dy - 30
+        text = options.getText?(d) or [d.y]
         current.tips.rect
           .attr(
-            width: 80
-            height: 25
+            width: options.rectWidth
+            height: options.fontSize * (1.5 * text.length + .5)
             rx: 5
             ry: 5
           )
+        tx = d.dx - 5
+        ty = d.dy - 30
+        tx = 0 if tx < 0
+        maxX = options.width - options.rectWidth
+        tx = maxX if tx > maxX
+        ty = 0 if ty < 0
         tips = current.tips.wrap
-          .style('transform', 'translate(' + tx + ',' + ty + ')')
-        # TODO add text
+          .style('transform', 'translate(' + tx + 'px,' + ty + 'px)')
+        tips.selectAll('text').remove()
+        _.each(text, (t, i) ->
+          tips.append('text')
+            .attr(
+              x: options.fontSize * .5
+              y: options.fontSize * 1.5 * (i + 1)
+              'font-size': options.fontSize
+            )
+            .text(t)
+        )
         current.tips.display()
       else
         current.tips.display(true)
