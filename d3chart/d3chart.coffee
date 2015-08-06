@@ -13,6 +13,9 @@ define((require, module, exports) ->
     rectWidth: 40
   }
   frag = document.createDocumentFragment()
+  _id = 0
+
+  getId = -> _id += 1
 
   # https://github.com/wbzyl/d3-notes/blob/master/hello-drop-shadow.html
   # http://commons.oreilly.com/wiki/index.php/SVG_Essentials/Filters
@@ -31,10 +34,10 @@ define((require, module, exports) ->
       .attr(
         type: 'matrix'
         values: (
-          '0 0 0 ' + shadowRGBA[0] + ' 0 ' +
-          '0 0 0 ' + shadowRGBA[1] + ' 0 ' +
-          '0 0 0 ' + shadowRGBA[2] + ' 0 ' +
-          '0 0 0 ' + shadowRGBA[3] + ' 0 '
+          "0 0 0 #{shadowRGBA[0]} 0 " +
+          "0 0 0 #{shadowRGBA[1]} 0 " +
+          "0 0 0 #{shadowRGBA[2]} 0 " +
+          "0 0 0 #{shadowRGBA[3]} 0 "
         )
       )
     filter.append('feGaussianBlur')
@@ -56,6 +59,23 @@ define((require, module, exports) ->
     feMerge.append('feMergeNode')
       .attr('in', 'SourceGraphic')
 
+  addLinearGradient = (svg, id, stop0, stop1 = 'white') ->
+    gradient = svg.append('defs')
+      .append('linearGradient')
+      .attr(
+        id: id
+        x1: 0
+        y1: -.5
+        x2: 0
+        y2: 1
+      )
+    gradient.append('stop')
+      .attr('offset', 0)
+      .style('stop-color', stop0)
+    gradient.append('stop')
+      .attr('offset', 1)
+      .style('stop-color', stop1)
+
   (data, options) ->
     options = _.extend({}, defaults, options)
     options.minX ?= d3.min(data, (d) -> d.x)
@@ -71,7 +91,11 @@ define((require, module, exports) ->
         width: options.width
         height: options.height
       )
-    addShadowFilter(svg, 'drop-shadow')
+    id = getId()
+    fillId = "d3chart-fill-#{id}"
+    shadowId = "d3chart-shadow-#{id}"
+    addShadowFilter(svg, shadowId)
+    addLinearGradient(svg, fillId, options.stroke)
 
     x = d3.scale.linear()
       .domain([options.minX, options.maxX])
@@ -104,33 +128,17 @@ define((require, module, exports) ->
       )
 
     # draw area
-    fillId = 'chartFill'
     area = d3.svg.area()
       .x((d) -> d.dx)
       .y0(options.height)
       .y1((d) -> d.dy)
       .interpolate('monotone')
-    gradient = svg.append('defs')
-      .append('linearGradient')
-      .attr(
-        id: fillId
-        x1: 0
-        y1: -.5
-        x2: 0
-        y2: 1
-      )
-    gradient.append('stop')
-      .attr('offset', 0)
-      .style('stop-color', options.stroke)
-    gradient.append('stop')
-      .attr('offset', 1)
-      .style('stop-color', 'white')
     svg.append('path')
       .attr(
         'class': 'area'
         d: area(data)
       )
-      .style('fill', 'url(#' + fillId + ')')
+      .style('fill', "url(##{fillId})")
 
     current = {
       show: ->
@@ -153,10 +161,10 @@ define((require, module, exports) ->
     current.circle.el = current.circle.wrap
       .append('circle')
       .attr('fill', options.stroke)
-      .style('filter', 'url(#drop-shadow)')
+      .style('filter', "url(##{shadowId})")
     current.tips.rect = current.tips.wrap
       .append('rect')
-      .style('filter', 'url(#drop-shadow)')
+      .style('filter', "url(##{shadowId})")
     current.hide()
 
     showCircle = (d) ->
@@ -185,7 +193,7 @@ define((require, module, exports) ->
       ty = maxY if ty > maxY
       ty = 0 if ty < 0
       tips = current.tips.wrap
-      tips.style('transform', 'translate(' + tx + 'px,' + ty + 'px)')
+      tips.style('transform', "translate(#{tx}px,#{ty}px)")
       tips.selectAll('text').remove()
       _.each(text, (t, i) ->
         tips.append('text')
