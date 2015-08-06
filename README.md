@@ -1,7 +1,7 @@
 D3 Projects
 ===
 
-This is a repository of D3 projects for learning purpose.
+This is a repository of [D3](http://d3js.org) projects for learning purpose.
 
 Project details
 ---
