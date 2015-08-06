@@ -87,8 +87,7 @@ define((require, module, exports) ->
       .attr('offset', 1)
       .style('stop-color', 'white')
     svg.append('path')
-      .datum(data)
-      .attr('d', area)
+      .attr('d', area(data))
       .style('fill', 'url(#' + fillId + ')')
 
     display = (hide) ->

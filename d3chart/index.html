@@ -44,6 +44,12 @@
         ], {
           minY: 0,
           maxY: 30,
+          getText: function (d) {
+            return [
+              'X: ' + d.x,
+              'Y: ' + d.y,
+            ];
+          },
         }
       ));
     </script>
