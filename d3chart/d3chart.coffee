@@ -132,20 +132,22 @@ define((require, module, exports) ->
       )
       .style('fill', 'url(#' + fillId + ')')
 
-    display = (hide) ->
-      # TODO debounce
-      hide = !!hide
-      return if @hidden == hide
-      @hidden = hide
-      @wrap.style('display', if hide then 'none' else 'block')
     current = {
+      show: ->
+        return unless @hidden
+        @hidden = false
+        @circle.wrap.style('display', 'block')
+        @tips.wrap.style('display', 'block')
+      hide: ->
+        return if @hidden
+        @hidden = true
+        @circle.wrap.style('display', 'none')
+        @tips.wrap.style('display', 'none')
       circle: {
         wrap: svg.append('g').attr('class', 'circle-wrap')
-        display: display
       }
       tips: {
         wrap: svg.append('g').attr('class', 'text-wrap')
-        display: display
       }
     }
     current.circle.el = current.circle.wrap
@@ -155,54 +157,45 @@ define((require, module, exports) ->
     current.tips.rect = current.tips.wrap
       .append('rect')
       .style('filter', 'url(#drop-shadow)')
-    current.circle.display(true)
-    current.tips.display(true)
+    current.hide()
 
     showCircle = (d) ->
-      if d
-        circle = current.circle.el
-        #circle = circle.transition().duration(100)
-        circle.attr(
-          cx: d.dx
-          cy: d.dy
-        )
-        current.circle.display()
-      else
-        current.circle.display(true)
+      circle = current.circle.el
+      #circle = circle.transition().duration(100)
+      circle.attr(
+        cx: d.dx
+        cy: d.dy
+      )
     showText = (d) ->
-      if d
-        text = options.getText?(d) or [d.y]
-        th = options.fontSize * (1.5 * text.length + .5)
-        current.tips.rect
-          .attr(
-            width: options.rectWidth
-            height: th
-            rx: 5
-            ry: 5
-          )
-        tx = d.dx - 5
-        ty = d.dy - th - 10
-        maxX = options.width - options.rectWidth
-        maxY = options.height - th
-        tx = maxX if tx > maxX
-        tx = 0 if tx < 0
-        ty = maxY if ty > maxY
-        ty = 0 if ty < 0
-        tips = current.tips.wrap
-        tips.style('transform', 'translate(' + tx + 'px,' + ty + 'px)')
-        tips.selectAll('text').remove()
-        _.each(text, (t, i) ->
-          tips.append('text')
-            .attr(
-              x: options.fontSize * .5
-              y: options.fontSize * 1.5 * (i + 1)
-              'font-size': options.fontSize
-            )
-            .text(t)
+      text = options.getText?(d) or [d.y]
+      th = options.fontSize * (1.5 * text.length + .5)
+      current.tips.rect
+        .attr(
+          width: options.rectWidth
+          height: th
+          rx: 5
+          ry: 5
         )
-        current.tips.display()
-      else
-        current.tips.display(true)
+      tx = d.dx - 5
+      ty = d.dy - th - 10
+      maxX = options.width - options.rectWidth
+      maxY = options.height - th
+      tx = maxX if tx > maxX
+      tx = 0 if tx < 0
+      ty = maxY if ty > maxY
+      ty = 0 if ty < 0
+      tips = current.tips.wrap
+      tips.style('transform', 'translate(' + tx + 'px,' + ty + 'px)')
+      tips.selectAll('text').remove()
+      _.each(text, (t, i) ->
+        tips.append('text')
+          .attr(
+            x: options.fontSize * .5
+            y: options.fontSize * 1.5 * (i + 1)
+            'font-size': options.fontSize
+          )
+          .text(t)
+      )
 
     svg.selectAll('path').on('mousemove', ->
       dx = d3.event.offsetX
@@ -213,11 +206,14 @@ define((require, module, exports) ->
           cir.d = d
         cir
       , {})
-      showCircle cir.d
-      showText cir.d
+      if cir.d
+        showCircle cir.d
+        showText cir.d
+        current.show()
+      else
+        current.hide()
     ).on('mouseleave', ->
-      current.circle.display(true)
-      current.tips.display(true)
+      current.hide()
     )
 
     svg[0][0]
