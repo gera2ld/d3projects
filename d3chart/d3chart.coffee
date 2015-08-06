@@ -195,15 +195,16 @@ define((require, module, exports) ->
       tips = current.tips.wrap
       tips.style('transform', "translate(#{tx}px,#{ty}px)")
       tips.selectAll('text').remove()
-      _.each(text, (t, i) ->
-        tips.append('text')
-          .attr(
-            x: options.fontSize * .5
-            y: options.fontSize * 1.5 * (i + 1)
-            'font-size': options.fontSize
-          )
-          .text(t)
-      )
+      tips.selectAll('text')
+        .data(text)
+        .enter()
+        .append('text')
+        .attr(
+          x: options.fontSize * .5
+          y: (d, i) -> options.fontSize * 1.5 * (i + 1)
+          'font-size': options.fontSize
+        )
+        .text((d) -> d)
 
     svg.selectAll('path').on('mousemove', ->
       dx = d3.event.offsetX
