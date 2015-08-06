@@ -9,15 +9,39 @@
       .d3chart {
         border: 1px solid;
       }
+      .item {
+        position: relative;
+        width: 260px;
+        height: 150px;
+      }
+      .text {
+        position: absolute;
+        font-size: 20px;
+        line-height: 20px;
+        height: 20px;
+        width: 100px;
+        top: 50%;
+        left: 50%;
+        margin-top: -10px;
+        margin-left: -50px;
+        text-align: center;
+      }
+      svg {
+        position: absolute;
+        z-index: 1;
+      }
     </style>
   </head>
   <body>
+    <div class="item">
+      <div class="text">Hello</div>
+    </div>
     <script>
       var define=function(callback){window.d3chart=callback();};
     </script>
     <script src="d3chart.js"></script>
     <script>
-      document.body.appendChild(d3chart(
+      document.querySelector('.item').appendChild(d3chart(
         [
           {x: 0, y: 0},
           {x: 1, y: 2},

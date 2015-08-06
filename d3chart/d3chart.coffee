@@ -133,10 +133,11 @@ define((require, module, exports) ->
       .style('fill', 'url(#' + fillId + ')')
 
     display = (hide) ->
+      # TODO debounce
       hide = !!hide
       return if @hidden == hide
       @hidden = hide
-      #@wrap.style('display', if hide then 'none' else 'block')
+      @wrap.style('display', if hide then 'none' else 'block')
     current = {
       circle: {
         wrap: svg.append('g').attr('class', 'circle-wrap')
@@ -203,7 +204,7 @@ define((require, module, exports) ->
       else
         current.tips.display(true)
 
-    svg.on('mousemove', ->
+    svg.selectAll('path').on('mousemove', ->
       dx = d3.event.offsetX
       cir = _.reduce(data, (cir, d) ->
         delta = Math.abs(d.dx - dx)
@@ -214,8 +215,7 @@ define((require, module, exports) ->
       , {})
       showCircle cir.d
       showText cir.d
-    )
-    svg.on('mouseleave', ->
+    ).on('mouseleave', ->
       current.circle.display(true)
       current.tips.display(true)
     )
