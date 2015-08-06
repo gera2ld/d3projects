@@ -1,9 +1,10 @@
 define((require, module, exports) ->
-  utils = require('d3utils')
+  utils = require('./d3utils')
 
   defaults = {
     width: 200
     height: 40
+    maxX: null
     strokeWidth: 10
     colors: null
     getText: null
@@ -13,34 +14,42 @@ define((require, module, exports) ->
   }
 
   colorGenerator = (colors) ->
-    _config = {index: -1}
+    index = -1
     isArray = Array.isArray(colors)
     ->
-      _config.index = _config.index + 1
+      index = index + 1
       if isArray
-        colors[_config.index = _config.index % colors.length]
+        colors[index = index % colors.length]
       else
-        colors(_config.index)
+        colors(index)
 
   (array, options) ->
     options = _.extend({}, defaults, options)
     unless options.colors
       options.colors = d3.scale.category10()
     getColor = colorGenerator(options.colors)
-    halfHeight = options.strokeWidth >>> 1
+    halfHeight = options.strokeWidth / 2
     id = utils.getId()
     clipperId = "d3bar-clipper-#{id}"
     shadowId = "d3chart-shadow-#{id}"
 
+    sum = d3.sum(array)
+    options.maxX ?= sum
     x = d3.scale.linear()
-      .domain([0, d3.sum(array)])
+      .domain([0, options.maxX])
       .range([0, options.width])
-    lastWidth = 0
-    data = _.map(array, (d, i) ->
-      r = {value: d, index: i, x: lastWidth, dx: x(d)}
-      lastWidth += r.dx
-      r
-    )
+    data = _.reduce(array, (obj, d, i) ->
+      r = {
+        value: d
+        index: i
+        x: obj.lastWidth
+        dx: x(d)
+      }
+      obj.list.push(r)
+      obj.lastWidth += r.dx
+      obj
+    , {list: [], lastWidth: 0}).list
+    sumX = x(sum)
 
     svg = utils.newSVG()
       .attr(
@@ -49,14 +58,12 @@ define((require, module, exports) ->
         height: options.height
       )
     utils.addShadowFilter(svg, shadowId)
-    clipper = svg.append('defs')
-      .append('clipPath')
-      .attr('id', clipperId)
+    clipper = utils.addClipPath(svg, clipperId)
     clipper.append('rect')
       .attr(
         x: 0
         y: 0
-        width: options.width
+        width: sumX
         height: options.strokeWidth
         rx: halfHeight
         ry: halfHeight
@@ -86,11 +93,8 @@ define((require, module, exports) ->
       text = options.getText?(d) or [d.value]
       th = options.fontSize * (options.lineHeight * (text.length + 1) - 1)
       tips.rect.attr('height', th)
-      tx = d.x
       ty = options.height - options.strokeWidth - th - 5
-      maxX = options.width - options.rectWidth
-      tx = maxX if tx > maxX
-      tx = 0 if tx < 0
+      tx = utils.ensureRange(d.x, 5, options.width - options.rectWidth - 5)
       wrap = tips.wrap
       wrap.style('transform', "translate(#{tx}px,#{ty}px)")
       wrap.selectAll('text').remove()

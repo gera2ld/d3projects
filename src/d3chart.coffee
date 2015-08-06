@@ -121,14 +121,8 @@ define((require, module, exports) ->
       text = options.getText?(d) or [d.y]
       th = options.fontSize * (options.lineHeight * (text.length + 1) - 1)
       current.tips.rect.attr('height', th)
-      tx = d.dx - 5
-      ty = d.dy - th - 10
-      maxX = options.width - options.rectWidth
-      maxY = options.height - th
-      tx = maxX if tx > maxX
-      tx = 0 if tx < 0
-      ty = maxY if ty > maxY
-      ty = 0 if ty < 0
+      tx = utils.ensureRange(d.dx - 5, 0, options.width - options.rectWidth)
+      ty = utils.ensureRange(d.dy - th - 10, 0, options.height - th)
       tips = current.tips.wrap
       tips.style('transform', "translate(#{tx}px,#{ty}px)")
       tips.selectAll('text').remove()

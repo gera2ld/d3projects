@@ -1,17 +1,29 @@
 define((require, module, exports) ->
   _id = 0
-  frag = document.createDocumentFragment()
+  _frag = document.createDocumentFragment()
 
   getId = -> _id += 1
 
+  ensureRange = (num, min, max) ->
+    unless max == null
+      num = max if num > max
+    unless min == null
+      num = min if num < min
+    num
+
   newSVG = ->
-    d3.select(frag)
+    d3.select(_frag)
       .append('svg')
       .remove()
 
+  addClipPath = (svg, id) ->
+    svg.append('defs')
+      .append('clipPath')
+      .attr('id', id)
+
   # https://github.com/wbzyl/d3-notes/blob/master/hello-drop-shadow.html
   # http://commons.oreilly.com/wiki/index.php/SVG_Essentials/Filters
-  addShadowFilter = (svg, id) ->
+  addShadowFilter = (svg, id, rgba = [.5, .5, .5, 1]) ->
     filter = svg.append('defs')
       .append('filter')
       .attr(
@@ -21,15 +33,14 @@ define((require, module, exports) ->
         x: -.5
         y: -.5
       )
-    shadowRGBA = [.5, .5, .5, 1]
     filter.append('feColorMatrix')
       .attr(
         type: 'matrix'
         values: (
-          "0 0 0 #{shadowRGBA[0]} 0 " +
-          "0 0 0 #{shadowRGBA[1]} 0 " +
-          "0 0 0 #{shadowRGBA[2]} 0 " +
-          "0 0 0 #{shadowRGBA[3]} 0 "
+          "0 0 0 #{rgba[0]} 0 " +
+          "0 0 0 #{rgba[1]} 0 " +
+          "0 0 0 #{rgba[2]} 0 " +
+          "0 0 0 #{rgba[3]} 0 "
         )
       )
     filter.append('feGaussianBlur')
@@ -70,7 +81,9 @@ define((require, module, exports) ->
 
   {
     getId: getId
+    ensureRange: ensureRange
     newSVG: newSVG
+    addClipPath: addClipPath
     addShadowFilter: addShadowFilter
     addLinearGradient: addLinearGradient
   }
