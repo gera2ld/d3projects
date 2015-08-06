@@ -60,7 +60,7 @@ define((require, module, exports) ->
       .interpolate('monotone')
     svg.append('path')
       .attr(
-        'class': 'line'
+        'class': 'd3chart-line'
         stroke: options.stroke
         d: line(data)
       )
@@ -73,7 +73,7 @@ define((require, module, exports) ->
       .interpolate('monotone')
     svg.append('path')
       .attr(
-        'class': 'area'
+        'class': 'd3chart-area'
         d: area(data)
       )
       .style('fill', "url(##{fillId})")
@@ -90,10 +90,10 @@ define((require, module, exports) ->
         @circle.wrap.style('display', 'none')
         @tips.wrap.style('display', 'none')
       circle: {
-        wrap: svg.append('g').attr('class', 'circle-wrap')
+        wrap: svg.append('g').attr('class', 'd3chart-circle')
       }
       tips: {
-        wrap: svg.append('g').attr('class', 'text-wrap')
+        wrap: svg.append('g').attr('class', 'd3chart-text')
       }
     }
     current.circle.el = current.circle.wrap
@@ -137,7 +137,7 @@ define((require, module, exports) ->
         )
         .text((d) -> d)
 
-    svg.selectAll('path').on('mousemove', ->
+    svg.select('path.d3chart-area').on('mousemove', ->
       dx = d3.event.offsetX
       cir = _.reduce(data, (cir, d) ->
         delta = Math.abs(d.dx - dx)

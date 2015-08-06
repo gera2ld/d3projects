@@ -70,7 +70,7 @@ define((require, module, exports) ->
       )
 
     tips = {
-      wrap: svg.append('g').attr('class', 'text-wrap')
+      wrap: svg.append('g').attr('class', 'd3bar-text')
       show: ->
         return unless @hidden
         @hidden = false
@@ -118,7 +118,7 @@ define((require, module, exports) ->
       .enter()
       .append('line')
       .attr(
-        'class': 'animate-line'
+        'class': 'd3bar-line'
         stroke: -> getColor()
         'stroke-width': options.strokeWidth
         x1: 0
