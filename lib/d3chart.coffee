@@ -1,4 +1,6 @@
 define((require, module, exports) ->
+  utils = require('./d3utils')
+
   defaults = {
     width: 260
     height: 150
@@ -11,70 +13,8 @@ define((require, module, exports) ->
     getText: null
     fontSize: 12
     rectWidth: 40
+    lineHeight: 1.5
   }
-  frag = document.createDocumentFragment()
-  _id = 0
-
-  getId = -> _id += 1
-
-  # https://github.com/wbzyl/d3-notes/blob/master/hello-drop-shadow.html
-  # http://commons.oreilly.com/wiki/index.php/SVG_Essentials/Filters
-  addShadowFilter = (svg, id) ->
-    filter = svg.append('defs')
-      .append('filter')
-      .attr(
-        id: id
-        width: 2
-        height: 2
-        x: -.5
-        y: -.5
-      )
-    shadowRGBA = [.5, .5, .5, 1]
-    filter.append('feColorMatrix')
-      .attr(
-        type: 'matrix'
-        values: (
-          "0 0 0 #{shadowRGBA[0]} 0 " +
-          "0 0 0 #{shadowRGBA[1]} 0 " +
-          "0 0 0 #{shadowRGBA[2]} 0 " +
-          "0 0 0 #{shadowRGBA[3]} 0 "
-        )
-      )
-    filter.append('feGaussianBlur')
-      .attr(
-        #'in': 'SourceAlpha'
-        stdDeviation: 2.5
-        result: 'blur'
-      )
-    filter.append('feOffset')
-      .attr(
-        'in': 'blur'
-        dx: 0
-        dy: 2
-        result: 'offsetBlur'
-      )
-    feMerge = filter.append('feMerge')
-    feMerge.append('feMergeNode')
-      .attr('in', 'offsetBlur')
-    feMerge.append('feMergeNode')
-      .attr('in', 'SourceGraphic')
-
-  addLinearGradient = (svg, id, stop0, stop1 = 'white') ->
-    gradient = svg.append('defs')
-      .append('linearGradient')
-      .attr(
-        id: id
-        x1: 0
-        y1: -.5
-        x2: 0
-        y2: 1
-      )
-    gradient.append('stop')
-      .attr('offset', 0)
-      .style('stop-color', stop0)
-    gradient.append('stop')
-      .attr('offset', 1)
-      .style('stop-color', stop1)
 
   (data, options) ->
     options = _.extend({}, defaults, options)
@@ -83,19 +23,17 @@ define((require, module, exports) ->
     options.maxX ?= d3.max(data, (d) -> d.x)
     options.maxY ?= d3.max(data, (d) -> d.y)
 
-    svg = d3.select(frag)
-      .append('svg')
-      .remove()
+    svg = utils.newSVG()
       .attr(
         'class': 'd3chart'
         width: options.width
         height: options.height
       )
-    id = getId()
+    id = utils.getId()
     fillId = "d3chart-fill-#{id}"
     shadowId = "d3chart-shadow-#{id}"
-    addShadowFilter(svg, shadowId)
-    addLinearGradient(svg, fillId, options.stroke)
+    utils.addShadowFilter(svg, shadowId)
+    utils.addLinearGradient(svg, fillId, options.stroke)
 
     x = d3.scale.linear()
       .domain([options.minX, options.maxX])
@@ -165,6 +103,11 @@ define((require, module, exports) ->
     current.tips.rect = current.tips.wrap
       .append('rect')
       .style('filter', "url(##{shadowId})")
+      .attr(
+        width: options.rectWidth
+        rx: 5
+        ry: 5
+      )
     current.hide()
 
     showCircle = (d) ->
@@ -176,14 +119,8 @@ define((require, module, exports) ->
       )
     showText = (d) ->
       text = options.getText?(d) or [d.y]
-      th = options.fontSize * (1.5 * text.length + .5)
-      current.tips.rect
-        .attr(
-          width: options.rectWidth
-          height: th
-          rx: 5
-          ry: 5
-        )
+      th = options.fontSize * (options.lineHeight * (text.length + 1) - 1)
+      current.tips.rect.attr('height', th)
       tx = d.dx - 5
       ty = d.dy - th - 10
       maxX = options.width - options.rectWidth
@@ -201,7 +138,7 @@ define((require, module, exports) ->
         .append('text')
         .attr(
           x: options.fontSize * .5
-          y: (d, i) -> options.fontSize * 1.5 * (i + 1)
+          y: (d, i) -> options.fontSize * options.lineHeight * (i + 1)
           'font-size': options.fontSize
         )
         .text((d) -> d)
