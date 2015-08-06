@@ -18,3 +18,9 @@ Development
 $ npm i coffee -g
 $ coffee -o lib -wc src/*.coffee
 ```
+
+Screenshots
+---
+![d3bar](screenshots/d3bar.png)
+
+![d3chart](screenshots/d3chart.png)
