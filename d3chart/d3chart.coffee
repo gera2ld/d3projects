@@ -1,19 +1,60 @@
 define((require, module, exports) ->
   defaults = {
-    width: 200
-    height: 160
+    width: 260
+    height: 150
     minX: null
     maxX: null
     minY: null
     maxY: null
-    stroke: 'blue'
-    fillStart: 'green'
+    stroke: '#7ed321'
     threshold: 15
     getText: null
     fontSize: 12
     rectWidth: 40
   }
   frag = document.createDocumentFragment()
+
+  # https://github.com/wbzyl/d3-notes/blob/master/hello-drop-shadow.html
+  # http://commons.oreilly.com/wiki/index.php/SVG_Essentials/Filters
+  addShadowFilter = (svg, id) ->
+    filter = svg.append('defs')
+      .append('filter')
+      .attr(
+        id: id
+        width: 2
+        height: 2
+        x: -.5
+        y: -.5
+      )
+    shadowRGBA = [.5, .5, .5, 1]
+    filter.append('feColorMatrix')
+      .attr(
+        type: 'matrix'
+        values: (
+          '0 0 0 ' + shadowRGBA[0] + ' 0 ' +
+          '0 0 0 ' + shadowRGBA[1] + ' 0 ' +
+          '0 0 0 ' + shadowRGBA[2] + ' 0 ' +
+          '0 0 0 ' + shadowRGBA[3] + ' 0 '
+        )
+      )
+    filter.append('feGaussianBlur')
+      .attr(
+        #'in': 'SourceAlpha'
+        stdDeviation: 2.5
+        result: 'blur'
+      )
+    filter.append('feOffset')
+      .attr(
+        'in': 'blur'
+        dx: 0
+        dy: 2
+        result: 'offsetBlur'
+      )
+    feMerge = filter.append('feMerge')
+    feMerge.append('feMergeNode')
+      .attr('in', 'offsetBlur')
+    feMerge.append('feMergeNode')
+      .attr('in', 'SourceGraphic')
 
   (data, options) ->
     options = _.extend({}, defaults, options)
@@ -30,6 +71,7 @@ define((require, module, exports) ->
         width: options.width
         height: options.height
       )
+    addShadowFilter(svg, 'drop-shadow')
 
     x = d3.scale.linear()
       .domain([options.minX, options.maxX])
@@ -73,13 +115,13 @@ define((require, module, exports) ->
       .attr(
         id: fillId
         x1: 0
-        y1: 0
+        y1: -.5
         x2: 0
         y2: 1
       )
     gradient.append('stop')
       .attr('offset', 0)
-      .style('stop-color', options.fillStart)
+      .style('stop-color', options.stroke)
     gradient.append('stop')
       .attr('offset', 1)
       .style('stop-color', 'white')
@@ -94,25 +136,30 @@ define((require, module, exports) ->
       hide = !!hide
       return if @hidden == hide
       @hidden = hide
-      @wrap.style('display', if hide then 'none' else 'block')
+      #@wrap.style('display', if hide then 'none' else 'block')
     current = {
       circle: {
-        hidden: true
-        wrap: svg.append('g').attr('class', 'circle-wrap').style('display', 'none')
+        wrap: svg.append('g').attr('class', 'circle-wrap')
         display: display
       }
       tips: {
-        hidden: true
-        wrap: svg.append('g').attr('class', 'text-wrap').style('display', 'none')
+        wrap: svg.append('g').attr('class', 'text-wrap')
         display: display
       }
     }
-    current.circle.dom = current.circle.wrap.append('circle')
-    current.tips.rect = current.tips.wrap.append('rect')
+    current.circle.el = current.circle.wrap
+      .append('circle')
+      .attr('fill', options.stroke)
+      .style('filter', 'url(#drop-shadow)')
+    current.tips.rect = current.tips.wrap
+      .append('rect')
+      .style('filter', 'url(#drop-shadow)')
+    current.circle.display(true)
+    current.tips.display(true)
 
     showCircle = (d) ->
       if d
-        circle = current.circle.dom
+        circle = current.circle.el
         #circle = circle.transition().duration(100)
         circle.attr(
           cx: d.dx
@@ -133,7 +180,7 @@ define((require, module, exports) ->
             ry: 5
           )
         tx = d.dx - 5
-        ty = d.dy - th - 5
+        ty = d.dy - th - 10
         maxX = options.width - options.rectWidth
         maxY = options.height - th
         tx = maxX if tx > maxX
@@ -141,7 +188,7 @@ define((require, module, exports) ->
         ty = maxY if ty > maxY
         ty = 0 if ty < 0
         tips = current.tips.wrap
-          .style('transform', 'translate(' + tx + 'px,' + ty + 'px)')
+        tips.style('transform', 'translate(' + tx + 'px,' + ty + 'px)')
         tips.selectAll('text').remove()
         _.each(text, (t, i) ->
           tips.append('text')
