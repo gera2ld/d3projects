@@ -5,6 +5,8 @@ define((require, module, exports) ->
     colors: null
   }
   frag = document.createDocumentFragment()
+  _id = 0
+  getId = -> _id += 1
 
   colorGenerator = (colors) ->
     _config = {index: -1}
@@ -22,6 +24,8 @@ define((require, module, exports) ->
     unless options.colors
       options.colors = d3.scale.category10()
     getColor = colorGenerator(options.colors)
+    halfHeight = options.height >>> 1
+    clipperId = "d3bar-clipper-#{getId()}"
 
     x = d3.scale.linear()
       .domain([0, d3.sum(data)])
@@ -30,25 +34,30 @@ define((require, module, exports) ->
       .append('svg')
       .remove()
       .attr('class', 'd3bar')
-      #.attr('style', "border-radius:#{options.height>>>1}px")
     bars = svg.attr(
       width: options.width
       height: options.height
     )
+    clipper = svg.append('defs')
+      .append('clipPath')
+      .attr('id', clipperId)
+    clipper.append('rect')
+      .attr(
+        x: 0
+        y: 0
+        width: options.width
+        height: options.height
+        rx: halfHeight
+        ry: halfHeight
+      )
 
-    attrs = {
-      lastWidth: 0
-    }
+    lastWidth = 0
 
-    bars.selectAll('g')
+    bars.append('g')
+      .attr('clip-path', "url(##{clipperId})")
+      .selectAll('line')
       .data(data)
       .enter()
-      .append('g')
-      .attr('transform', (d, i) ->
-        currentX = "translate(#{attrs.lastWidth},#{options.height>>>1})"
-        attrs.lastWidth += x(d)
-        currentX
-      )
       .append('line')
       .attr(
         'class': 'animate-line'
@@ -58,6 +67,10 @@ define((require, module, exports) ->
         y1: 0
         x2: (d) -> x(d)
         y2: 0
+        transform: (d, i) ->
+          currentX = "translate(#{lastWidth},#{halfHeight})"
+          lastWidth += x(d)
+          currentX
       )
 
     svg[0][0]
