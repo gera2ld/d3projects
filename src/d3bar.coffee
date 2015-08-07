@@ -3,14 +3,15 @@ define((require, module, exports) ->
 
   defaults = {
     width: 200
-    height: 40
+    height: 10
     maxX: null
-    strokeWidth: 10
     colors: null
     getText: null
     rectWidth: 40
     fontSize: 16
     lineHeight: 1.2
+    onmouseover: null
+    onmouseleave: null
   }
 
   colorGenerator = (colors) ->
@@ -28,7 +29,7 @@ define((require, module, exports) ->
     unless options.colors
       options.colors = d3.scale.category10()
     getColor = colorGenerator(options.colors)
-    halfHeight = options.strokeWidth / 2
+    halfHeight = options.height / 2
     id = utils.getId()
     clipperId = "d3bar-clipper-#{id}"
     shadowId = "d3chart-shadow-#{id}"
@@ -64,63 +65,21 @@ define((require, module, exports) ->
         x: 0
         y: 0
         width: sumX
-        height: options.strokeWidth
+        height: options.height
         rx: halfHeight
         ry: halfHeight
       )
 
-    tips = {
-      wrap: svg.append('g').attr('class', 'd3bar-text')
-      show: ->
-        return unless @hidden
-        @hidden = false
-        @wrap.style('display', 'block')
-      hide: ->
-        return if @hidden
-        @hidden = true
-        @wrap.style('display', 'none')
-    }
-    tips.rect = tips.wrap.append('rect')
-      .style('filter', "url(##{shadowId})")
-      .attr(
-        width: options.rectWidth
-        rx: 5
-        ry: 5
-      )
-    tips.hide()
-
-    showText = (d) ->
-      text = options.getText?(d) or [d.value]
-      th = options.fontSize * (options.lineHeight * (text.length + 1) - 1)
-      tips.rect.attr('height', th)
-      ty = options.height - options.strokeWidth - th - 5
-      tx = utils.ensureRange(d.x, 5, options.width - options.rectWidth - 5)
-      wrap = tips.wrap
-      wrap.style('transform', "translate(#{tx}px,#{ty}px)")
-      wrap.selectAll('text').remove()
-      wrap.selectAll('text')
-        .data(text)
-        .enter()
-        .append('text')
-        .attr(
-          'text-anchor': 'middle'
-          x: options.rectWidth / 2
-          y: (d, i) -> options.fontSize * options.lineHeight * (i + 1)
-          'font-size': options.fontSize
-        )
-        .text((d) -> d)
-
-    svg.append('g')
+    wrap = svg.append('g')
       .attr('clip-path', "url(##{clipperId})")
-      .style('transform', "translate(0,#{options.height - options.strokeWidth}px)")
-      .selectAll('line')
+    wrap.selectAll('line')
       .data(data)
       .enter()
       .append('line')
       .attr(
         'class': 'd3bar-line'
         stroke: -> getColor()
-        'stroke-width': options.strokeWidth
+        'stroke-width': options.height
         x1: 0
         y1: 0
         x2: (d) -> d.dx
@@ -132,11 +91,10 @@ define((require, module, exports) ->
       .on('mouseover', ->
         line = d3.select(this)
         [d] = line.data()
-        showText d
-        tips.show()
+        options.onmouseover? d3.event, d
       )
-      .on('mouseleave', ->
-        tips.hide()
+    wrap.on('mouseleave', ->
+        options.onmouseleave? d3.event
       )
 
     svg[0][0]
