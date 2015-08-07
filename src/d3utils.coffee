@@ -28,10 +28,10 @@ define((require, module, exports) ->
       .append('filter')
       .attr(
         id: id
-        width: 2
-        height: 2
-        x: -.5
-        y: -.5
+        width: 1.4
+        height: 1.4
+        x: -.2
+        y: -.1
       )
     filter.append('feColorMatrix')
       .attr(
@@ -46,14 +46,14 @@ define((require, module, exports) ->
     filter.append('feGaussianBlur')
       .attr(
         #'in': 'SourceAlpha'
-        stdDeviation: 2.5
+        stdDeviation: 1
         result: 'blur'
       )
     filter.append('feOffset')
       .attr(
         'in': 'blur'
         dx: 0
-        dy: 2
+        dy: 1
         result: 'offsetBlur'
       )
     feMerge = filter.append('feMerge')

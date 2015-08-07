@@ -96,10 +96,17 @@ define((require, module, exports) ->
         wrap: svg.append('g').attr('class', 'd3chart-text')
       }
     }
-    current.circle.el = current.circle.wrap
-      .append('circle')
-      .attr('fill', options.stroke)
-      .style('filter', "url(##{shadowId})")
+    current.circle.el = do ->
+      wrap = current.circle.wrap
+      wrap.append('circle')
+        .attr('class', 'd3chart-outer-circle')
+        .style('filter', "url(##{shadowId})")
+      wrap.append('circle')
+        .attr(
+          'class': 'd3chart-inner-circle'
+          fill: options.stroke
+        )
+      wrap.selectAll('circle')
     current.tips.rect = current.tips.wrap
       .append('rect')
       .style('filter', "url(##{shadowId})")
