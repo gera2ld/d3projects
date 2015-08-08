@@ -6,12 +6,11 @@ define((require, module, exports) ->
     height: 10
     maxX: null
     colors: null
-    getText: null
-    rectWidth: 40
     fontSize: 16
     lineHeight: 1.2
     onmouseover: null
     onmouseleave: null
+    transition: 500
   }
 
   colorGenerator = (colors) ->
@@ -60,19 +59,22 @@ define((require, module, exports) ->
       )
     utils.addShadowFilter(svg, shadowId)
     clipper = utils.addClipPath(svg, clipperId)
-    clipper.append('rect')
+    clipper_rect = clipper.append('rect')
       .attr(
         x: 0
         y: 0
-        width: sumX
+        width: 0
         height: options.height
         rx: halfHeight
         ry: halfHeight
       )
+    if options.transition
+      clipper_rect = clipper_rect.transition().duration(options.transition)
+    clipper_rect.attr('width', sumX)
 
     wrap = svg.append('g')
       .attr('clip-path', "url(##{clipperId})")
-    wrap.selectAll('line')
+    lines = wrap.selectAll('line')
       .data(data)
       .enter()
       .append('line')
@@ -80,9 +82,9 @@ define((require, module, exports) ->
         'class': 'd3bar-line'
         stroke: -> getColor()
         'stroke-width': options.height
-        x1: (d) -> d.x
+        x1: 0
+        x2: 0
         y1: halfHeight
-        x2: (d) -> d.x + d.dx
         y2: halfHeight
       )
       .on('mouseover', ->
@@ -90,6 +92,12 @@ define((require, module, exports) ->
         [d] = line.data()
         options.onmouseover? d3.event, d
       )
+    if options.transition
+      lines = lines.transition().duration(options.transition)
+    lines.attr(
+      x1: (d) -> d.x
+      x2: (d) -> d.x + d.dx
+    )
     wrap.on('mouseleave', ->
         options.onmouseleave? d3.event
       )

@@ -2,15 +2,5 @@
 	fill: white;
 }
 .d3bar .d3bar-line {
-	stroke-dasharray: 2000;
-	animation: d3bar-dash 2s linear;
 	cursor: pointer;
-}
-@keyframes d3bar-dash {
-	from {
-		stroke-dashoffset: 2000;
-	}
-	to {
-		stroke-dashoffset: 0;
-	}
 }
