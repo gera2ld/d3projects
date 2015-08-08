@@ -80,13 +80,10 @@ define((require, module, exports) ->
         'class': 'd3bar-line'
         stroke: -> getColor()
         'stroke-width': options.height
-        x1: 0
-        y1: 0
-        x2: (d) -> d.dx
-        y2: 0
-        transform: (d, i) ->
-          currentX = "translate(#{d.x},#{halfHeight})"
-          currentX
+        x1: (d) -> d.x
+        y1: halfHeight
+        x2: (d) -> d.x + d.dx
+        y2: halfHeight
       )
       .on('mouseover', ->
         line = d3.select(this)
