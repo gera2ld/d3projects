@@ -1,19 +1,23 @@
 .d3lock-circles circle {
-	stroke: white;
+	stroke: #ccc;
 	stroke-width: 2;
         fill: rgba(0,0,0,0);
 }
 .d3lock-circles circle.d3lock-selected {
 	fill: rgba(0,0,0,.4);
 }
-.d3lock-path {
-	stroke: white;
+.d3lock-path path {
+	stroke: #ccc;
 	stroke-width: 2;
 	fill: none;
 }
-.d3lock-path.d3lock-pass {
+.d3lock-path circle {
+	fill: #ccc;
+
+}
+.d3lock-path.d3lock-pass path {
 	stroke: green;
 }
-.d3lock-path.d3lock-fail {
+.d3lock-path.d3lock-fail path {
 	stroke: red;
 }

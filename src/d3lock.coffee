@@ -4,6 +4,7 @@ define((require, module, exports) ->
   defaults = {
     size: 200
     r: null
+    ir: null
     checkData: null
     delay: 500
   }
@@ -25,6 +26,7 @@ define((require, module, exports) ->
       }
     )
     options.r ?= ~~ (options.size / 12)
+    options.ir ?= options.r >> 1
 
     line = d3.svg.line()
       .x((d) -> d.cx)
@@ -37,6 +39,15 @@ define((require, module, exports) ->
       return if d.selected
       d.selected = true
       selected.push d
+      path_wrap.selectAll('circle')
+        .data(selected)
+        .enter()
+        .append('circle')
+        .attr(
+          cx: (d) -> d.cx
+          cy: (d) -> d.cy
+          r: options.ir
+        )
 
     updatePath = (pos) ->
       pathData = selected
@@ -55,7 +66,9 @@ define((require, module, exports) ->
         touch.freeze = false
         circles_wrap.classed('d3lock-pass d3lock-fail', false)
         path.attr('d', '')
+        path_wrap
           .classed('d3lock-pass d3lock-fail', false)
+          .selectAll('circle').remove()
         circles.classed('d3lock-selected', false)
         cb?()
       , options.delay)
@@ -67,10 +80,10 @@ define((require, module, exports) ->
       r = options.checkData?(_.pluck(selected, 'index'))
       if r is true
         circles_wrap.classed('d3lock-pass', true)
-        path.classed('d3lock-pass', true)
+        path_wrap.classed('d3lock-pass', true)
       else if r is false
         circles_wrap.classed('d3lock-fail', true)
-        path.classed('d3lock-fail', true)
+        path_wrap.classed('d3lock-fail', true)
       clearPath()
 
     circles_wrap = svg.append('g')
@@ -107,9 +120,9 @@ define((require, module, exports) ->
       )
       .on('touchend', checkPath)
 
-    path = svg.append('g')
-      .append('path')
+    path_wrap = svg.append('g')
       .attr('class', 'd3lock-path')
+    path = path_wrap.append('path')
 
     svg[0][0]
 )

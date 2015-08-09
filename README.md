@@ -19,7 +19,7 @@ Development
 ---
 ``` sh
 $ npm i coffee -g
-$ coffee -o lib -wbc src/*.coffee
+$ coffee -o lib -wbc src
 ```
 
 Screenshots
