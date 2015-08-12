@@ -1,9 +1,5 @@
 .d3chart .d3chart-outer-circle {
 	fill: white;
-	r: 3;
-}
-.d3chart .d3chart-inner-circle {
-	r: 1;
 }
 .d3chart .d3chart-text rect {
 	fill: white;

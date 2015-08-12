@@ -98,12 +98,17 @@ define((require, module, exports) ->
     }
     current.circle.el = do ->
       wrap = current.circle.wrap
+      # Safari does not support `r` in CSS
       wrap.append('circle')
-        .attr('class', 'd3chart-outer-circle')
+        .attr(
+          'class': 'd3chart-outer-circle'
+          r: 3
+        )
         .style('filter', "url(##{shadowId})")
       wrap.append('circle')
         .attr(
           'class': 'd3chart-inner-circle'
+          r: 1
           fill: options.stroke
         )
       wrap.selectAll('circle')
@@ -131,7 +136,10 @@ define((require, module, exports) ->
       tx = utils.ensureRange(d.dx - 5, 0, options.width - options.rectWidth)
       ty = utils.ensureRange(d.dy - th - 10, 0, options.height - th)
       tips = current.tips.wrap
-      tips.style('transform', "translate(#{tx}px,#{ty}px)")
+      tips.style(
+        '-webkit-transform': "translate(#{tx}px,#{ty}px)"
+        transform: "translate(#{tx}px,#{ty}px)"
+      )
       tips.selectAll('text').remove()
       tips.selectAll('text')
         .data(text)

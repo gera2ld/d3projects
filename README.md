@@ -12,7 +12,7 @@ Project details
 * **d3chart**  
   Draw a square chart with given points. A smooth line is rendered and the area below the line will be linear-gradient colored.
 
-* **d3lock**
+* **d3lock**  
   A guesture lock designed built on SVG.
 
 Development
