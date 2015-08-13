@@ -136,10 +136,10 @@ define((require, module, exports) ->
       tx = utils.ensureRange(d.dx - 5, 0, options.width - options.rectWidth)
       ty = utils.ensureRange(d.dy - th - 10, 0, options.height - th)
       tips = current.tips.wrap
-      tips.style(
-        '-webkit-transform': "translate(#{tx}px,#{ty}px)"
-        transform: "translate(#{tx}px,#{ty}px)"
-      )
+      # https://css-tricks.com/transforms-on-svg-elements/
+      # https://developer.mozilla.org/en/docs/Web/SVG/Attribute/transform
+      # Use transform attributes for cross-browser support
+      tips.attr('transform', "translate(#{tx},#{ty})")
       tips.selectAll('text').remove()
       tips.selectAll('text')
         .data(text)
