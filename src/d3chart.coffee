@@ -53,12 +53,17 @@ define((require, module, exports) ->
       }
     )
 
+    linearea = {
+      line: {}
+      area: {}
+    }
+
     # draw line
     line = d3.svg.line()
       .x((d) -> d.dx)
       .y((d) -> d.dy)
       .interpolate('monotone')
-    svg.append('path')
+    linearea.line.el = svg.append('path')
       .attr(
         'class': 'd3chart-line'
         stroke: options.stroke
@@ -71,7 +76,7 @@ define((require, module, exports) ->
       .y0(options.height)
       .y1((d) -> d.dy)
       .interpolate('monotone')
-    svg.append('path')
+    linearea.area.el = svg.append('path')
       .attr(
         'class': 'd3chart-area'
         d: area(data)
@@ -85,7 +90,7 @@ define((require, module, exports) ->
         @circle.wrap.style('display', 'block')
         @tips.wrap.style('display', 'block')
       hide: ->
-        return if @hidden
+        return if @hidden or linearea.line.hovered or linearea.area.hovered
         @hidden = true
         @circle.wrap.style('display', 'none')
         @tips.wrap.style('display', 'none')
@@ -152,7 +157,7 @@ define((require, module, exports) ->
         )
         .text((d) -> d)
 
-    svg.select('path.d3chart-area').on('mousemove', ->
+    onmousemove = ->
       dx = d3.event.offsetX
       cir = _.reduce(data, (cir, d) ->
         delta = Math.abs(d.dx - dx)
@@ -167,7 +172,20 @@ define((require, module, exports) ->
         current.show()
       else
         current.hide()
+
+    linearea.line.el.on('mousemove', ->
+      linearea.line.hovered = true
+      onmousemove()
     ).on('mouseleave', ->
+      linearea.line.hovered = false
+      current.hide()
+    )
+
+    linearea.area.el.on('mousemove', ->
+      linearea.area.hovered = true
+      onmousemove()
+    ).on('mouseleave', ->
+      linearea.area.hovered = false
       current.hide()
     )
 
