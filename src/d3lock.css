@@ -1,7 +1,7 @@
 .d3lock-circles circle {
 	stroke: #ccc;
 	stroke-width: 2;
-        fill: rgba(0,0,0,0);
+  fill: rgba(0,0,0,0);
 }
 .d3lock-circles circle.d3lock-selected {
 	fill: rgba(0,0,0,.4);

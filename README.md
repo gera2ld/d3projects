@@ -15,17 +15,6 @@ Project details
 * **d3lock**  
   A guesture lock designed built on SVG.
 
-Development
+Demo
 ---
-``` sh
-$ npm i coffee -g
-$ coffee -o lib -wbc src
-```
-
-Screenshots
----
-![d3bar](screenshots/d3bar.png)
-
-![d3chart](screenshots/d3chart.png)
-
-![d3lock](screenshots/d3lock.png)
+:point_right: [Go](http://intellilab.github.io/d3projects/)
