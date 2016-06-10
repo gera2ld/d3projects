@@ -4,7 +4,8 @@
   "description": "D3 projects for learning purpose.",
   "main": "index.js",
   "scripts": {
-    "predeploy": "gulp build",
+    "dev": "gulp watch",
+    "build": "gulp build",
     "deploy": "sh tools/build-gh.sh"
   },
   "repository": {

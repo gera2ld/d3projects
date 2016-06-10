@@ -1,7 +1,6 @@
-DEMO_DIR=dist-demo
+DEMO_DIR=dist
 rm -rf $DEMO_DIR
-cp -R tools/demo $DEMO_DIR
-cp dist/* $DEMO_DIR
+npm run build
 cd $DEMO_DIR
 git init
 git add -A

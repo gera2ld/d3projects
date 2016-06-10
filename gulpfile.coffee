@@ -24,4 +24,12 @@ gulp.task 'build-css', ->
     .pipe concat 'style.css'
     .pipe gulp.dest 'dist'
 
-gulp.task 'build', ['build-coffee', 'build-css']
+gulp.task 'copy', ->
+  gulp.src 'tools/demo/**'
+    .pipe gulp.dest 'dist'
+
+gulp.task 'build', ['build-coffee', 'build-css', 'copy']
+
+gulp.task 'watch', ['build'], ->
+  gulp.watch ['src/**/*.coffee', 'src/**/*.js'], ['build-coffee']
+  gulp.watch ['src/**/*.css'], ['build-css']
