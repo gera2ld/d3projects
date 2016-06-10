@@ -11,6 +11,12 @@ module.exports = (data, options) => {
   const svg = utils.newSVG().attr({
     width: size,
     height: size,
+  })
+  .on('click', () => {
+    const svgEl = svg[0][0];
+    utils.svg2img(svgEl).then(img => {
+      svgEl.parentNode.replaceChild(img, svgEl);
+    });
   });
   const total = d3.sum(data, item => item.value);
   const colors = d3.scale.category10();

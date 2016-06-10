@@ -73,6 +73,28 @@ addLinearGradient = (svg, id, stop0, stop1 = 'white') ->
     .attr 'offset', 1
     .style 'stop-color', stop1
 
+svg2img = (svg) -> new Promise (resolve, reject) ->
+  serializer = new XMLSerializer
+  xml = serializer.serializeToString svg
+  blob = new Blob [xml], (type: 'image/svg+xml')
+  url = URL.createObjectURL blob
+  img = new Image
+  img.src = url
+  img.onload = ->
+    dpi = window.devicePixelRatio or 1
+    canvas = document.createElement 'canvas'
+    canvas.width = dpi * img.width
+    canvas.height = dpi * img.height
+    ctx = canvas.getContext '2d'
+    ctx.scale dpi, dpi
+    ctx.drawImage img, 0, 0
+    dImg = new Image
+    dImg.src = do canvas.toDataURL
+    dImg.style.width = img.width + 'px'
+    dImg.style.height = img.height + 'px'
+    resolve dImg
+    URL.revokeObjectURL url
+
 module.exports =
   $: $
   getId: getId
@@ -81,3 +103,4 @@ module.exports =
   addClipPath: addClipPath
   addShadowFilter: addShadowFilter
   addLinearGradient: addLinearGradient
+  svg2img: svg2img

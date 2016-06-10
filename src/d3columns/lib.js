@@ -22,6 +22,12 @@ module.exports = function (data, options) {
   const svg = utils.newSVG().attr({
     width: options.width,
     height: options.height,
+  })
+  .on('click', () => {
+    const svgEl = svg[0][0];
+    utils.svg2img(svgEl).then(img => {
+      svgEl.parentNode.replaceChild(img, svgEl);
+    });
   });
   svg.append('g')
   .selectAll('path')
