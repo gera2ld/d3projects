@@ -22,7 +22,6 @@ Project details
 
   A special pie chart with round-capped pieces.
 
+* **d3columns**
 
-Demo
----
-:point_right: [Go](http://intellilab.github.io/d3projects/)
+  A bar chart with round-capped columns.
