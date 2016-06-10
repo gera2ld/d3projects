@@ -4,6 +4,7 @@ module.exports = (data, options) => {
   options = Object.assign({
     outerRadius: 100,
     innerRadius: 80,
+    startAngle: 0,
   }, options);
   options.cornerRadius = (options.outerRadius - options.innerRadius) / 2;
   const size = options.outerRadius * 2;
@@ -23,7 +24,7 @@ module.exports = (data, options) => {
     item.startAngle = startAngle;
     const endAngle = item.endAngle = startAngle + item.value * 2 * Math.PI / total;
     return endAngle;
-  }, 0);
+  }, options.startAngle);
   svg.append('g')
   .attr('transform', `translate(${options.outerRadius},${options.outerRadius})`)
   .selectAll('path')
