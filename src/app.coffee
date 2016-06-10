@@ -1,4 +1,4 @@
-do require './app-d3bar'
-do require './app-d3chart'
-do require './app-d3lock'
-do require './app-d3pie'
+do require './d3bar'
+do require './d3chart'
+do require './d3lock'
+do require './d3pie'

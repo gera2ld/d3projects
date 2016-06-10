@@ -1,4 +1,4 @@
-utils = require './d3utils'
+utils = require '../d3utils'
 
 defaults =
   width: 200

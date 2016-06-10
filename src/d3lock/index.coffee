@@ -1,5 +1,5 @@
-d3lock = require './d3lock'
-$ = require './d3utils'
+d3lock = require './lib'
+$ = require '../d3utils'
   .$
 
 module.exports = ->

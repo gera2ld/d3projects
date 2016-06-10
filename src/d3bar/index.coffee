@@ -1,5 +1,5 @@
-d3bar = require './d3bar'
-$ = require './d3utils'
+d3bar = require './lib'
+$ = require '../d3utils'
   .$
 
 module.exports = ->
