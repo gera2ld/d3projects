@@ -1,0 +1,92 @@
+.d3chart {
+  border: 1px solid;
+}
+#d3chart {
+  position: relative;
+  width: 260px;
+  height: 150px;
+}
+#d3chart .text {
+  position: absolute;
+  font-size: 20px;
+  line-height: 20px;
+  height: 20px;
+  width: 100px;
+  top: 50%;
+  left: 50%;
+  margin-top: -15px;
+  margin-left: -50px;
+  text-align: center;
+}
+#d3chart svg {
+  position: absolute;
+  z-index: 1;
+}
+
+#d3lock {
+  padding: 1em 0;
+  background: #305066;
+  font-size: 20px;
+}
+#d3lock .lock {
+  max-width: 300px;
+  margin: 0 auto;
+}
+#d3lock button {
+  font-size: 1em;
+}
+.lock-title {
+  text-align: center;
+  color: white;
+  height: 60px;
+}
+.lock-body,
+.lock-reset {
+  text-align: center;
+}
+
+.d3bar .d3bar-text rect {
+	fill: white;
+}
+.d3bar .d3bar-line {
+	cursor: pointer;
+}
+
+.d3chart .d3chart-outer-circle {
+	fill: white;
+}
+.d3chart .d3chart-text rect {
+	fill: white;
+	width: 40;
+}
+.d3chart .d3chart-text text {
+	stroke: black;
+}
+.d3chart .d3chart-line {
+	stroke-width: 2;
+	fill: none;
+}
+
+.d3lock-circles circle {
+	stroke: #ccc;
+	stroke-width: 2;
+  fill: rgba(0,0,0,0);
+}
+.d3lock-circles circle.d3lock-selected {
+	fill: rgba(0,0,0,.4);
+}
+.d3lock-path path {
+	stroke: #ccc;
+	stroke-width: 2;
+	fill: none;
+}
+.d3lock-path circle {
+	fill: #ccc;
+
+}
+.d3lock-path.d3lock-pass path {
+	stroke: green;
+}
+.d3lock-path.d3lock-fail path {
+	stroke: red;
+}
